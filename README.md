@@ -8,7 +8,7 @@ Specifically, we will have students use data on pokemon battles to predict who w
 - VSCode
 - Liner
 
-## Python packages to be downloaded
+## Python packages to be downloaded:
 - pandas
 - seaborn
 - matplotlib
