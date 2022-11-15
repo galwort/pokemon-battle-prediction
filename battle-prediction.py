@@ -10,7 +10,7 @@ from sklearn.metrics import accuracy_score
 
 # second section, explain loading the data and running a visualization
 pokemon = pd.read_csv("pokemon.csv")
-sns.barplot(x="Type 1", y="Attack", data=pokemon)
+sns.barplot(x="Type 1", y="HP", data=pokemon)
 plt.show()
 
 # third section, just say pull in combats now
