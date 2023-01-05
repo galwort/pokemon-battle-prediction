@@ -7,11 +7,12 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
+from pickle import dump
 
 # second section, explain loading the data and running a visualization
 pokemon = pd.read_csv("pokemon.csv")
 sns.barplot(x="Type 1", y="HP", data=pokemon)
-plt.show()
+# plt.show()
 
 # third section, just say pull in combats now
 battles = pd.read_csv("combats.csv")
@@ -48,9 +49,7 @@ y_pred = rf.predict(X_test)
 print(accuracy_score(y_test, y_pred))
 
 # seventh section, save the model
-import pickle
-
-pickle.dump(rf, open("poke_model.pkl", "wb"))
+dump(rf, open("poke_model.pkl", "wb"))
 
 # eighth section, load the model and make a prediction
 model = pickle.load(open("poke_model.pkl", "rb"))
