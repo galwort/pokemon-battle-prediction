@@ -25,15 +25,11 @@ poke_battles["Target"] = poke_battles["Winner"] == poke_battles["First_pokemon"]
 # fourth section, preprocessing
 poke_battles = poke_battles.drop(["#_x", "Name_x", "#_y", "Name_y"], axis=1)
 encoder = LabelEncoder()
-poke_battles["Type_1_x"] = encoder.fit_transform(poke_battles["Type 1_x"])
-poke_battles["Type_2_x"] = encoder.fit_transform(poke_battles["Type 2_x"])
-poke_battles["Type_1_y"] = encoder.fit_transform(poke_battles["Type 1_y"])
-poke_battles["Type_2_y"] = encoder.fit_transform(poke_battles["Type 2_y"])
-
-
-poke_battles = pd.get_dummies(
-    poke_battles, columns=["Type 1_x", "Type 2_x", "Type 1_y", "Type 2_y"]
-)
+poke_battles["Type_1_x_Encode"] = encoder.fit_transform(poke_battles["Type 1_x"])
+poke_battles["Type_2_x_Encode"] = encoder.fit_transform(poke_battles["Type 2_x"])
+poke_battles["Type_1_y_Encode"] = encoder.fit_transform(poke_battles["Type 1_y"])
+poke_battles["Type_2_y_Encode"] = encoder.fit_transform(poke_battles["Type 2_y"])
+poke_battles = poke_battles.drop(["Type 1_x", "Type 2_x", "Type 1_y", "Type 2_y"], axis=1)
 
 # fifth section, train test split
 X = poke_battles.drop(["Winner", "Target"], axis=1)
