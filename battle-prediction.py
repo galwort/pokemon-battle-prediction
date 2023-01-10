@@ -5,9 +5,10 @@ import matplotlib.pyplot as plt
 
 # save for later, add after fifth section
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
-from pickle import dump
+from pickle import dump, load
 
 # second section, explain loading the data and running a visualization
 pokemon = pd.read_csv("pokemon.csv")
@@ -22,12 +23,13 @@ poke_battles = poke_battles.merge(pokemon, left_on="Second_pokemon", right_on="#
 poke_battles["Target"] = poke_battles["Winner"] == poke_battles["First_pokemon"]
 
 # fourth section, preprocessing
-# TODO: take care of userwarnings
 poke_battles = poke_battles.drop(["#_x", "Name_x", "#_y", "Name_y"], axis=1)
-poke_battles.Type_1_x = poke_battles["Type 1_x"].astype("category")
-poke_battles.Type_2_x = poke_battles["Type 2_x"].astype("category")
-poke_battles.Type_1_y = poke_battles["Type 1_y"].astype("category")
-poke_battles.Type_2_y = poke_battles["Type 2_y"].astype("category")
+encoder = LabelEncoder()
+poke_battles["Type_1_x"] = encoder.fit_transform(poke_battles["Type 1_x"])
+poke_battles["Type_2_x"] = encoder.fit_transform(poke_battles["Type 2_x"])
+poke_battles["Type_1_y"] = encoder.fit_transform(poke_battles["Type 1_y"])
+poke_battles["Type_2_y"] = encoder.fit_transform(poke_battles["Type 2_y"])
+
 
 poke_battles = pd.get_dummies(
     poke_battles, columns=["Type 1_x", "Type 2_x", "Type 1_y", "Type 2_y"]
@@ -52,7 +54,7 @@ print(accuracy_score(y_test, y_pred))
 dump(rf, open("poke_model.pkl", "wb"))
 
 # eighth section, load the model and make a prediction
-model = pickle.load(open("poke_model.pkl", "rb"))
+model = load(open("poke_model.pkl", "rb"))
 print(model.predict(X_test.iloc[0:1]))
 print(X_test.iloc[0:1])
 
