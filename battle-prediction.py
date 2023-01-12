@@ -23,7 +23,7 @@ poke_battles = poke_battles.merge(pokemon, left_on="Second_pokemon", right_on="#
 poke_battles["Target"] = poke_battles["Winner"] == poke_battles["First_pokemon"]
 
 # fourth section, preprocessing
-poke_battles = poke_battles.drop(["#_x", "Name_x", "#_y", "Name_y"], axis=1)
+poke_battles = poke_battles.drop(["First_pokemon", "Second_pokemon", "Winner", "#_x", "Name_x", "#_y", "Name_y"], axis=1)
 encoder = LabelEncoder()
 poke_battles["Type_1_x_Encode"] = encoder.fit_transform(poke_battles["Type 1_x"])
 poke_battles["Type_2_x_Encode"] = encoder.fit_transform(poke_battles["Type 2_x"])
@@ -32,7 +32,7 @@ poke_battles["Type_2_y_Encode"] = encoder.fit_transform(poke_battles["Type 2_y"]
 poke_battles = poke_battles.drop(["Type 1_x", "Type 2_x", "Type 1_y", "Type 2_y"], axis=1)
 
 # fifth section, train test split
-X = poke_battles.drop(["Winner", "Target"], axis=1)
+X = poke_battles.drop(["Target"], axis=1)
 y = poke_battles.Target
 
 X_train, X_test, y_train, y_test = train_test_split(
@@ -44,31 +44,26 @@ rf = RandomForestClassifier(n_estimators=100, max_depth=10, random_state=42)
 rf.fit(X_train, y_train)
 y_pred = rf.predict(X_test)
 
-print(accuracy_score(y_test, y_pred))
-
 # seventh section, save the model
 dump(rf, open("poke_model.pkl", "wb"))
 
 # eighth section, load the model and make a prediction
 model = load(open("poke_model.pkl", "rb"))
-print(model.predict(X_test.iloc[0:1]))
-print(X_test.iloc[0:1])
 
 
-# # ninth section, make a prediction
-# def predict_winner(pokemon_1, pokemon_2):
-#     pokemon_1 = pokemon[pokemon['Name'] == pokemon_1]
-#     pokemon_2 = pokemon[pokemon['Name'] == pokemon_2]
-#     pokemon_1 = pokemon_1.drop(['#', 'Name', 'Type 1', 'Type 2'], axis=1)
-#     pokemon_2 = pokemon_2.drop(['#', 'Name', 'Type 1', 'Type 2'], axis=1)
-#     pokemon_1 = pd.get_dummies(pokemon_1, columns=['Type 1', 'Type 2'])
-#     pokemon_2 = pd.get_dummies(pokemon_2, columns=['Type 1', 'Type 2'])
-#     pokemon_1 = pokemon_1.reindex(columns=pokemon_2.columns, fill_value=0)
-#     pokemon_2 = pokemon_2.reindex(columns=pokemon_1.columns, fill_value=0)
-#     pokemon_1 = pokemon_1.append(pokemon_2)
-#     pokemon_1 = pokemon_1.reset_index(drop=True)
-#     prediction = model.predict(pokemon_1)
-#     if prediction[0] == 1:
-#         return pokemon_1['Name'][0]
-#     else:
-#         return pokemon_1['Name'][1]
+# ninth section, make a prediction
+def predict_winner(pokemon_1, pokemon_2):
+    poke_df_x = pokemon[pokemon["Name"] == pokemon_1]
+    poke_df_y = pokemon[pokemon["Name"] == pokemon_2]
+    poke_df_x.columns = [col + "_x" for col in poke_df_x.columns]
+    poke_df_y.columns = [col + "_y" for col in poke_df_y.columns]
+    poke_df = poke_df_x.merge(poke_df_y, left_index=True, right_index=True)
+    poke_df.drop(["#_x", "Name_x", "#_y", "Name_y"], axis=1)
+    poke_df["Type_1_x_Encode"] = encoder.transform(poke_df["Type 1_x"])
+    poke_df["Type_2_x_Encode"] = encoder.transform(poke_df["Type 2_x"])
+    poke_df["Type_1_y_Encode"] = encoder.transform(poke_df["Type 1_y"])
+    poke_df["Type_2_y_Encode"] = encoder.transform(poke_df["Type 2_y"])
+    poke_df = poke_df.drop(["Type 1_x", "Type 2_x", "Type 1_y", "Type 2_y"], axis=1)
+    return model.predict(poke_df)[0]
+
+print(predict_winner("Charizard", "Blastoise"))
