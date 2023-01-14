@@ -57,6 +57,8 @@ def predict_winner(pokemon_1, pokemon_2):
     poke_df_y = pokemon[pokemon["Name"] == pokemon_2]
     poke_df_x.columns = [col + "_x" for col in poke_df_x.columns]
     poke_df_y.columns = [col + "_y" for col in poke_df_y.columns]
+    poke_df_x.reset_index(drop=True, inplace=True)
+    poke_df_y.reset_index(drop=True, inplace=True)
     poke_df = pd.concat([poke_df_x, poke_df_y], axis=1)
     poke_df = poke_df.drop(["#_x", "Name_x", "#_y", "Name_y"], axis=1)
     poke_df["Type_1_x_Encode"] = encoder.transform(poke_df["Type 1_x"])
@@ -64,6 +66,6 @@ def predict_winner(pokemon_1, pokemon_2):
     poke_df["Type_1_y_Encode"] = encoder.transform(poke_df["Type 1_y"])
     poke_df["Type_2_y_Encode"] = encoder.transform(poke_df["Type 2_y"])
     poke_df = poke_df.drop(["Type 1_x", "Type 2_x", "Type 1_y", "Type 2_y"], axis=1)
-    return model.predict(poke_df)[0]
+    return pokemon_1 if model.predict(poke_df)[0] else pokemon_2
 
-print(predict_winner("Charizard", "Blastoise"))
+print(predict_winner("Charmander", "Blastoise"))
